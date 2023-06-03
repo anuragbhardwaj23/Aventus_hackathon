@@ -153,6 +153,7 @@ startButton.addEventListener('click', function (event) {
         .then(function (response) {
           if (response.ok) {
             console.log('Image and user info saved successfully on the server');
+            alert("Registration Successfull!")
           } else {
             console.error('Failed to save the image and user info on the server');
           }
