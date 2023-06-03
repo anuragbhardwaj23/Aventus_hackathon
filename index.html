@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Webcam Photo Capture</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    #videoElement {
+      width: 100%;
+      height: auto;
+    }
+
+    #captureButton {
+      display: none;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+
+    #canvas {
+      display: none;
+    }
+  .inputform{
+      background-color:rgba(255, 255, 255, 0.1);
+      margin: auto;
+      width: 60vw;
+      height: 50vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;    
+  }
+  form{
+    position: relative;
+    /* float: right; */
+    /* margin-left: 200px; */
+    
+  }
+  body{
+    background-color: black;
+  }
+  .title{
+    color: aliceblue;
+    
+  
+    /* background-color: aliceblue; */
+  }
+  .title1{
+    background: radial-gradient(circle farthest-corner at center center, #FD4949 0%, #97076D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .facegate{
+    justify-content: center;
+    display: flex;
+    font-size: 90px;
+    padding: 10px 20px 20px 20px;
+  }
+  .icon{
+    font-size: 250px;
+    color: white;
+  }
+  .userinfo{
+    padding-left: 100px;
+  }
+  .submitbtn{
+    width:405px;
+    padding: 10px 30px 10px 30px;
+    font-size: 15px;
+    border-radius : 17px;
+  }
+
+#videoElement{
+  display: none;
+  font-size: 250px;
+  width : 20rem;
+  border-radius : 17px;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="maindiv">
+    <div class="facegate">
+      <div class="title">Face</div>
+      <div class="title1">Gate</div>
+    </div>    
+    <h1>Webcam Photo Capture</h1>
+    <div class="inputform">
+      <i class="fa fa-camera icon"></i>
+      <video id="videoElement"></video>
+      <form class="userinfo" id="userInfoForm">
+        <!-- <label for="name">Name:</label> -->
+        <input type="text" id="name" name="name" placeholder="Enter Your Name" required style="height: 35px; width: 400px;"><br><br>
+        <!-- <label for="ticketId">Ticket ID:</label> -->
+        <input type="text" id="ticketId" name="ticketId" placeholder="Enter Ticket Id" required style="height: 35px; width: 400px;"><br><br>
+        <button class="submitbtn" id="startButton">Register</button>
+      </form>
+    </div>
+  </div>
+  <!-- <video id="videoElement"></video> -->
+  <button id="captureButton">Capture Photo</button>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    var videoElement = document.getElementById('videoElement');
+var captureButton = document.getElementById('captureButton');
+var startButton = document.getElementById('startButton');
+var userInfoForm = document.getElementById('userInfoForm');
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+
+startButton.addEventListener('click', function (event) {
+  event.preventDefault();
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+      videoElement.srcObject = stream;
+      videoElement.play();
+      startButton.style.display = 'none';
+      captureButton.style.display = 'block';
+      document.querySelector('.icon').style.display = 'none'; // Hide the camera icon
+      videoElement.style.display = 'block'; // Display the video
+    })
+    .catch(function (error) {
+      console.error("Error accessing webcam: ", error);
+    });
+});
+
+    // Capture photo on button click
+    captureButton.addEventListener('click', function () {
+      // Set canvas dimensions equal to video dimensions
+      canvas.width = videoElement.videoWidth;
+      canvas.height = videoElement.videoHeight;
+
+      // Draw video frame onto the canvas
+      context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+      // Get the image data from the canvas as a data URL
+      var dataURL = canvas.toDataURL('image/png');
+
+      // Get user info from the form
+      var name = document.getElementById('name').value;
+      var ticketId = document.getElementById('ticketId').value;
+
+      // Send the image data and user info to the server
+      fetch('/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ dataURL: dataURL, name: name, ticketId: ticketId })
+      })
+        .then(function (response) {
+          if (response.ok) {
+            console.log('Image and user info saved successfully on the server');
+          } else {
+            console.error('Failed to save the image and user info on the server');
+          }
+        })
+        .catch(function (error) {
+          console.error('Error:', error);
+        });
+    });
+
+  </script>
+</body>
+
+</html>

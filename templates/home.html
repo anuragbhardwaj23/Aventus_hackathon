@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        h1 {
+            text-align: center;
+            font-size: 65px;
+        }
+        .verificationbtn {
+            margin: auto;
+            font-size: 40px;
+            background-color:#97076D;
+            border-radius: 10px;
+            color: aliceblue;
+            padding: 4px;
+        
+        }
+        body {
+            background-image: url('https://cutewallpaper.org/25/animated-wallpaper-looping-gifs/animated-background-posted-by-michelle-tremblay.gif');
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: aliceblue;
+        }
+        #verifying {
+            display: none;
+        }
+        ul{
+            font-size: 70px;
+            list-style: none;
+            text-align: center;
+        }
+        .face{
+            background: radial-gradient(circle farthest-corner at center center, #FD4949 0%, #97076D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        form{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+    <title>FaceGate</title>
+</head>
+<body>
+    <h1 >Face<span class="face">Gate</span></h1>
+    <h1 id="verifying">Verifying.......</h1>
+    <form  action="/compare_faces" method="post">
+        <input id="verifybtn" class="verificationbtn" type="submit" value="Start Verification">
+    </form>
+    <ul>
+        {% for result in results %}
+        <li>{{ result }}</li>
+        {% endfor %}
+    </ul>
+    <div id="result"></div>
+    <script>
+        const display = () => {
+            document.getElementById('verifying').style.display = 'block';
+        }
+
+        setTimeout(()=>{
+            document.getElementById('verifying').style.display = 'none';
+        },10000)
+
+        const submitbtn = document.getElementById('verifybtn');
+        submitbtn.addEventListener('click', display);
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    document.getElementById('result').innerHTML = xhr.responseText;
+                }
+            };
+            xhr.open('POST', '/compare_faces', true);
+            xhr.send();
+        });
+    </script>
+</body>
+</html>
